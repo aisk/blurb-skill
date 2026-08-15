@@ -15,8 +15,8 @@ Generating that file and putting it in the right place is the whole job. Staging
 committing it is not part of this skill; do that separately if the task calls for it.
 
 Everything goes through `scripts/add_blurb.py`. Do not hand-write the file: the
-timestamp and the nonce in the filename must be computed at run time, and the script
-is the only thing that does that correctly.
+filename carries a timestamp and a content hash that have to be computed as the entry
+is written, and the script is the only thing that does that correctly.
 
 ## Usage
 
@@ -60,13 +60,41 @@ Read these before writing the body; a violation is a hard error, not a warning.
   and `Python/ceval.c`. It does not ask git, because the tree may be an export. If it
   fails, you are in the wrong directory: find the checkout and pass `--repo-root`
   rather than working around the check.
-- **Section** must be one of: Security, Core and Builtins, Library, Documentation,
-  Tests, Build, Windows, macOS, IDLE, Tools/Demos, C API.
+- **Section** must be one of the eleven names below. See "Choosing the section".
 - **Issue number** must be at least 32426; anything lower is a Roundup (bpo) number,
   not a GitHub issue.
 - **Body** must be non-empty and must not start with `- `, `Issue #`, `bpo-`, `gh-`, or
   `gh-issue-`. The `- gh-issue-N: ` prefix is added when NEWS is rendered, so writing it
   yourself would double it up.
+
+## Choosing the section
+
+Pick from the files the change touches. This is the one decision the script cannot make
+for you, and a wrong section puts the entry under the wrong heading in the release
+notes.
+
+| Change touches | Section |
+| --- | --- |
+| `Python/`, `Objects/`, `Parser/`, the compiler, bytecode, builtin types and functions | Core and Builtins |
+| `Lib/` and the C accelerators behind it (`Modules/_json`, `Modules/_asyncio`, ...) | Library |
+| `Doc/` only | Documentation |
+| `Lib/test/` or a module's own test files, and nothing else | Tests |
+| `configure`, `configure.ac`, `Makefile.pre.in`, vendored dependencies | Build |
+| `PC/`, `PCbuild/`, or Windows-only behaviour | Windows |
+| `Mac/` or macOS-only behaviour | macOS |
+| `Lib/idlelib/` | IDLE |
+| `Tools/` (excluding IDLE and test helpers) | Tools/Demos |
+| `Include/` and the public C API | C API |
+| A vulnerability or a hardening fix, wherever it lives | Security |
+
+Three that are easy to get wrong:
+
+- **Security wins over the file location.** A CVE fix inside a stdlib module is
+  Security, not Library.
+- **Tests means changes to the test suite itself.** A bug that a test happened to catch
+  belongs to the section of the code that was fixed.
+- **C API means the public headers.** Changing a private helper in `Python/` is Core and
+  Builtins, even though it is C.
 
 ## Writing the body
 
@@ -75,19 +103,6 @@ the user's point of view. Sphinx roles such as :func:`os.stat` and :mod:`asyncio
 expected. Avoid section headers, footnotes, tables, and anything needing hard line
 breaks. The script wraps prose at 76 columns for you, so write it as one long line and
 let it wrap; bulleted lists and literal blocks are left alone.
-
-## Time and randomness
-
-The filename carries a `YYYY-MM-DD-hh-mm-ss` timestamp and a 6-character nonce.
-
-- The timestamp is read from the system clock when the script runs, in local time,
-  matching blurb. Never supply a date you believe to be current; a remembered or
-  inferred date will be wrong and will sort the entry into the wrong place.
-- The nonce is the first 6 characters of the urlsafe base64 of the MD5 digest of the
-  wrapped body. It exists to avoid filename collisions between contributors, so it is
-  derived, never invented.
-
-Both are computed inside the script. There is no option to override either, on purpose.
 
 ## Checking the result
 
