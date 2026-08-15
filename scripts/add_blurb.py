@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 """Create a CPython ``Misc/NEWS.d/next`` entry without an interactive editor.
 
-This mirrors what ``blurb add`` does, minus the editor round trip:
-detect the CPython checkout, validate the metadata and the body, wrap the
-body at 76 columns, then write
+This does what ``blurb add`` does, minus the editor round trip: detect the
+CPython checkout, validate the metadata and the body, wrap the body at 76
+columns, then write
 
     Misc/NEWS.d/next/<section>/<date>.gh-issue-<issue>.<nonce>.rst
 
 The date is read from the system clock at run time and the nonce is the
 MD5 digest of the wrapped body.  Neither value may be supplied by hand.
+
+Writing that file is the whole job; staging or committing it is left to
+the caller.
 """
 
 from __future__ import annotations
@@ -261,9 +264,6 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
         '-n', '--dry-run', action='store_true',
         help='print the path and the text, write nothing',
     )
-    parser.add_argument(
-        '--no-git-add', action='store_true', help='do not stage the new file in git'
-    )
     return parser.parse_args(argv)
 
 
@@ -303,17 +303,6 @@ def main(argv: list[str] | None = None) -> int:
     with open(path, 'w', encoding='utf-8') as file:
         file.write(body)
     print(path)
-
-    if not args.no_git_add:
-        result = subprocess.run(
-            ('git', 'add', '--force', path), cwd=root, capture_output=True, text=True
-        )
-        if result.returncode:
-            print(
-                f'Warning: the file was written but git add failed: '
-                f'{result.stderr.strip()}',
-                file=sys.stderr,
-            )
     return 0
 
 

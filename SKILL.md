@@ -1,14 +1,18 @@
 ---
 name: blurb
-user-invocable: true
-description: Create a CPython Misc/NEWS.d/next news entry (a "blurb") from the command line, without opening an editor. Use when the user asks to add a NEWS entry, a blurb, a changelog entry, or a Misc/NEWS.d file for a CPython change, or asks whether a change needs one. Handles CPython repo detection, section and issue validation, body wrapping, the timestamped filename, and git add.
+description: Create a CPython Misc/NEWS.d/next news entry (a "blurb") from the command line, without opening an editor. Use when the user asks to add a NEWS entry, a blurb, a changelog entry, or a Misc/NEWS.d file for a CPython change, or asks whether a change needs one. Handles CPython checkout detection, section and issue validation, body wrapping, and the timestamped filename.
+license: MIT
+compatibility: Requires Python 3.9+ and a CPython checkout to write into
 ---
 
 # blurb
 
-Create a `Misc/NEWS.d/next/<section>/<date>.gh-issue-<issue>.<nonce>.rst` file in a
+Write a `Misc/NEWS.d/next/<section>/<date>.gh-issue-<issue>.<nonce>.rst` file into a
 CPython checkout. This is what `blurb add` produces, except `blurb add` always opens
 `$GIT_EDITOR` / `$EDITOR`, which is unusable non-interactively.
+
+Generating that file and putting it in the right place is the whole job. Staging or
+committing it is not part of this skill; do that separately if the task calls for it.
 
 Everything goes through `scripts/add_blurb.py`. Do not hand-write the file: the
 timestamp and the nonce in the filename must be computed at run time, and the script
@@ -24,8 +28,7 @@ python3 <skill-dir>/scripts/add_blurb.py -i <issue> -s <section> -b "<body>"
 referenced by absolute path, because the command must run from inside the CPython
 checkout (or name it with `--repo-root`), not from the skill directory.
 
-The script prints the path it wrote and stages the file with `git add --force`,
-matching what `blurb add` does.
+The script prints the path it wrote, and writes nothing else.
 
 Options:
 
@@ -37,7 +40,6 @@ Options:
 | `-f`, `--body-file` | read the text from a file (`-` means stdin) |
 | `--repo-root` | target checkout, when running from outside it |
 | `-n`, `--dry-run` | print the path and text, write nothing |
-| `--no-git-add` | write the file but leave it unstaged |
 
 With neither `-b` nor `-f`, the body is read from stdin, which is the easiest way to
 pass text containing quotes:
@@ -89,7 +91,7 @@ Both are computed inside the script. There is no option to override either, on p
 
 ## Checking the result
 
-`git status --short Misc/NEWS.d` shows the staged file, and `cat` on the printed path
-shows the wrapped text. To preview how it will render in `Misc/NEWS`, run
+`cat` on the printed path shows the wrapped text, and `git status --short Misc/NEWS.d`
+shows the file as untracked. To preview how it will render in `Misc/NEWS`, run
 `blurb merge /tmp/NEWS.preview` from the checkout if blurb is installed; do not let it
 overwrite the real `Misc/NEWS`.
