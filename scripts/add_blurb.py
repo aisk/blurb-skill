@@ -21,9 +21,9 @@ import base64
 import hashlib
 import os
 import re
-import subprocess
 import sys
 import textwrap
+import time
 
 # Canonical section names, in the order blurb lists them.
 SECTIONS = (
@@ -199,23 +199,8 @@ def textwrap_body(text: str) -> str:
 
 
 def current_datetime() -> str:
-    """Read the clock from the system, never from anywhere else."""
-    try:
-        result = subprocess.run(
-            ('date', '+%Y-%m-%d-%H-%M-%S'),
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-    except (OSError, subprocess.CalledProcessError):
-        # No date(1) (Windows); fall back to the same call blurb makes.
-        import time
-
-        return time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
-    stamp = result.stdout.strip()
-    if not re.fullmatch(r'\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}', stamp):
-        raise UserError(f'date(1) returned an unusable timestamp: {stamp!r}')
-    return stamp
+    """Read the clock at run time, the same way blurb does."""
+    return time.strftime('%Y-%m-%d-%H-%M-%S', time.localtime())
 
 
 def generate_nonce(body: str) -> str:

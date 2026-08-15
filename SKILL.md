@@ -80,9 +80,9 @@ let it wrap; bulleted lists and literal blocks are left alone.
 
 The filename carries a `YYYY-MM-DD-hh-mm-ss` timestamp and a 6-character nonce.
 
-- The timestamp comes from `date +%Y-%m-%d-%H-%M-%S` at run time (local time, matching
-  blurb). Never supply a date you believe to be current; a cached or inferred date will
-  be wrong and will sort the entry into the wrong place.
+- The timestamp is read from the system clock when the script runs, in local time,
+  matching blurb. Never supply a date you believe to be current; a remembered or
+  inferred date will be wrong and will sort the entry into the wrong place.
 - The nonce is the first 6 characters of the urlsafe base64 of the MD5 digest of the
   wrapped body. It exists to avoid filename collisions between contributors, so it is
   derived, never invented.
