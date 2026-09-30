@@ -82,9 +82,9 @@ notes.
 | `Lib/` and the C accelerators behind it (`Modules/_json`, `Modules/_asyncio`, ...) | Library |
 | `Doc/` only | Documentation |
 | `Lib/test/` or a module's own test files, and nothing else | Tests |
-| `configure`, `configure.ac`, `Makefile.pre.in`, vendored dependencies | Build |
-| `PC/`, `PCbuild/`, or Windows-only behaviour | Windows |
-| `Mac/` or macOS-only behaviour | macOS |
+| `configure`, `configure.ac`, `Makefile.pre.in`, build tooling | Build |
+| `PC/`, `PCbuild/`, Windows-only behaviour, or a dependency bundled with the Windows installer | Windows |
+| `Mac/`, macOS-only behaviour, or a dependency bundled with the macOS installer | macOS |
 | `Lib/idlelib/` | IDLE |
 | `Tools/` (excluding IDLE and test helpers) | Tools/Demos |
 | `Include/` and the public C API | C API |
@@ -98,6 +98,17 @@ Three that are easy to get wrong:
   belongs to the section of the code that was fixed.
 - **C API means the public headers.** Changing a private helper in `Python/` is Core and
   Builtins, even though it is C.
+
+Updating a library vendored in the source tree, such as libexpat or libmpdec, goes
+under Security when the update fixes a vulnerability and under Library otherwise.
+
+## Does the change need an entry?
+
+Most user-visible changes do. Skip the entry for changes nobody using Python would
+notice: typo and grammar fixes, internal refactoring with no behaviour change, test-only
+or CI-only changes, and small documentation edits. In that case the pull request gets
+the `skip news` label instead of a file. When in doubt, write the entry; a reviewer can
+always ask for it to be removed.
 
 ## Writing the body
 
