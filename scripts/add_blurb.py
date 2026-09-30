@@ -125,6 +125,7 @@ def parse_issue(issue: str) -> int:
         stripped = issue.removeprefix('https://')
         stripped = stripped.removeprefix('http://')
         stripped = stripped.removeprefix('github.com/python/cpython/issues/')
+        stripped = stripped.split('#')[0].rstrip('/')
         if not stripped.isdecimal():
             raise UserError(f'Invalid GitHub issue number: {issue}')
         number = int(stripped)
@@ -153,8 +154,21 @@ def parse_section(section: str) -> str:
 
 
 def check_body(body: str) -> None:
+    """Validate the wrapped body the way blurb does when it reads the file."""
     if not body.strip():
         raise UserError("Blurb 'body' text must not be empty!")
+    # blurb treats leading '#' lines as comments and leading '..' lines as
+    # metadata, and a line holding only '..' ends the entry.
+    if body.startswith(('#', '..')):
+        raise UserError(
+            "Blurb 'body' can't start with '#' or '..'! "
+            'blurb would read that line as a comment or as metadata.'
+        )
+    if '..' in body.split('\n'):
+        raise UserError(
+            "Blurb 'body' can't contain a line with only '..'! "
+            'blurb would read it as the end of the entry.'
+        )
     for naughty_prefix in NAUGHTY_PREFIXES:
         if re.match(naughty_prefix, body, re.I):
             raise UserError(
@@ -257,9 +271,8 @@ def main(argv: list[str] | None = None) -> int:
 
     issue = parse_issue(args.issue)
     section = parse_section(args.section)
-    body = read_body(args)
+    body = textwrap_body(read_body(args))
     check_body(body)
-    body = textwrap_body(body)
 
     if args.repo_root:
         root = os.path.abspath(args.repo_root)

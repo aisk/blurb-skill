@@ -66,6 +66,9 @@ Read these before writing the body; a violation is a hard error, not a warning.
 - **Body** must be non-empty and must not start with `- `, `Issue #`, `bpo-`, `gh-`, or
   `gh-issue-`. The `- gh-issue-N: ` prefix is added when NEWS is rendered, so writing it
   yourself would double it up.
+- **Body** must not start with `#` or `..`, and must not contain a line that is only
+  `..`. When blurb reads the file back, it takes those as a comment, as metadata, or as
+  the end of the entry.
 
 ## Choosing the section
 
