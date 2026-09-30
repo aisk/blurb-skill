@@ -1,15 +1,17 @@
 ---
 name: blurb
-description: Create a CPython Misc/NEWS.d/next news entry (a "blurb") from the command line, without opening an editor. Use when the user asks to add a NEWS entry, a blurb, a changelog entry, or a Misc/NEWS.d file for a CPython change, or asks whether a change needs one. Handles CPython checkout detection, section and issue validation, body wrapping, and the timestamped filename.
+description: Help write a CPython Misc/NEWS.d/next news entry (a "blurb"), either from the user's description of the change or entirely on the agent's own. Use when the user asks to add a NEWS entry, a blurb, a changelog entry, or a Misc/NEWS.d file for a CPython change, or asks whether a change needs one. Handles CPython checkout detection, section and issue validation, body wrapping, and the timestamped filename.
 license: MIT
 compatibility: Requires Python 3.9+ and a CPython checkout to write into
 ---
 
 # blurb
 
-Write a `Misc/NEWS.d/next/<section>/<date>.gh-issue-<issue>.<nonce>.rst` file into a
-CPython checkout. This is what `blurb add` produces, except `blurb add` always opens
-`$GIT_EDITOR` / `$EDITOR`, which is unusable non-interactively.
+Help the user write a news entry for a CPython change, stored as
+`Misc/NEWS.d/next/<section>/<date>.gh-issue-<issue>.<nonce>.rst`. Usually the user
+describes the change and you turn that into the entry text, pick the section, and write
+the file. The user can also leave the whole entry to you, in which case work out the
+text and the section from the change itself.
 
 Generating that file and putting it in the right place is the whole job. Staging or
 committing it is not part of this skill; do that separately if the task calls for it.

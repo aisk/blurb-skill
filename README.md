@@ -1,8 +1,9 @@
 # blurb-skill
 
-An [agent skill](https://agentskills.io/specification) that lets an LLM generate a
-CPython `Misc/NEWS.d/next` news entry and put it in the right place, without opening an
-editor the way `blurb add` does.
+An [agent skill](https://agentskills.io/specification) that helps you write CPython
+`Misc/NEWS.d/next` news entries. Describe the change and the agent drafts the entry,
+picks the section, and puts the file in the right place. You can also leave the whole
+entry to the agent.
 
 ## Install
 
