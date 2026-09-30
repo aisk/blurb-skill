@@ -120,6 +120,21 @@ expected. Avoid section headers, footnotes, tables, and anything needing hard li
 breaks. The script wraps prose at 76 columns for you, so write it as one long line and
 let it wrap; bulleted lists and literal blocks are left alone.
 
+## Working from the change itself
+
+When the user leaves the whole entry to you:
+
+1. Read the change: the current branch against upstream `main` (the `upstream` remote
+   in the usual CPython setup, otherwise `origin`), plus any uncommitted changes.
+2. Decide whether it needs an entry at all, as described above. If it does not, say so
+   and stop.
+3. Look for the issue number in the branch name (often `gh-123456-...`) and the commit
+   messages. If there is none, ask the user for it and wait. Never guess or make one
+   up; the change may simply not have an issue yet.
+4. Pick the section from the files the diff touches, and write the body about what the
+   change means for users, not about how the code was edited.
+5. Run the script, then show the user the path and the text it wrote.
+
 ## Checking the result
 
 `cat` on the printed path shows the wrapped text, and `git status --short Misc/NEWS.d`
